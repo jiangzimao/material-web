@@ -47,7 +47,8 @@ function nextStep(id, option) {
 
 function back(id) {
     if(optionItemMap.has(id)){
-        return containerMap.get(optionItemMap.get(id).parentId).children.find((optionNode) => optionNode.type === 'option');
+        let parentId = containerMap.get(optionItemMap.get(id).parentId).parentId;
+        return containerMap.get(parentId).children.find((optionNode) => optionNode.type === 'option');
     }
 }
 
