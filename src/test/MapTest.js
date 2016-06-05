@@ -1,34 +1,53 @@
 class OptionNode {
-    constructor(id, pId){
+    constructor(id, parentId, type){
         this.id = id;
-        this.pId = pId;
+        this.parentId = parentId;
+        this.type = type;
         this.children = [];
     }
 }
 
 // 容器集合
-let containerMap = new Map();
+const containerMap = new Map();
 
 // 选项集合
-let optionItemMap = new Map();
+const optionItemMap = new Map();
 
- function appendContainer(id, parentId){
+function appendContainer(id, parentId){
     if (!containerMap.has(id)) {
         if(!containerMap.has(parentId)){
-            containerMap.set(parentId, new OptionNode(id, parentId));
+            containerMap.set(parentId, new OptionNode(id, parentId, 'container'));
         }
-        let container = new OptionNode(id, parentId);
+        let container = new OptionNode(id, parentId, 'container');
         containerMap.set(id, container);
         let parentContainer = containerMap.get(parentId);
         parentContainer.children.push(container);
     }
 }
 
- function appendOption(id, parentId){
-    let optionItem = new OptionNode(id, parentId);
+function appendOption(id, parentId){
+    let optionItem = new OptionNode(id, parentId, 'option');
     if(containerMap.has(parentId)){
         containerMap.get(parentId).children.push(optionItem);
         optionItemMap.set(id, optionItem);
+    }
+}
+
+function nextStep(id, option) {
+    if(optionItemMap.has(id)){
+        let currentOptionItems = containerMap.get(optionItemMap.get(id).parentId).children;
+        let currentIndex = currentOptionItems.findIndex((optionNode) => optionNode.id === id);
+        if(option > 0){
+            return currentOptionItems[(currentIndex + 1) % currentOptionItems.length];
+        } else {
+            return currentOptionItems[--currentIndex < 0 ? currentOptionItems.length - 1 : currentIndex];
+        }
+    }
+}
+
+function back(id) {
+    if(optionItemMap.has(id)){
+        return containerMap.get(optionItemMap.get(id).parentId).children.find((optionNode) => optionNode.type === 'option');
     }
 }
 
@@ -44,13 +63,23 @@ appendOption(23, 2);
 appendOption(30, 3);
 appendOption(31, 3);
 
-appendContainer(200, 2);
-appendOption(2000, 200);
+//appendContainer(200, 2);
+//appendOption(2000, 200);*/
+
+console.log(nextStep(22, 1));
+console.log(nextStep(22, -1));
+console.log(back(22));
 
 
+// console.log(containerMap.get(1));
+// console.log("===========================================");
+// console.log(containerMap.get(2));
+// console.log("===========================================");
+// console.log(containerMap.get(3));
 
 
-
-for (let [key, value] of containerMap.entries()) {
-    console.log(value);
-}
+/*
+for (let node of containerMap) {
+    console.log(node.value);
+    console.log("===========================================");
+}*/
